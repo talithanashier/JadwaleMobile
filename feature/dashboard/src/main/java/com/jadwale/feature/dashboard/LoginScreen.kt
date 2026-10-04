@@ -50,7 +50,6 @@ fun LoginScreen(
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-    var selectedRole by remember { mutableStateOf(UserRole.ADMIN_SEKOLAH) }
     var emailOrNip by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
@@ -121,51 +120,12 @@ fun LoginScreen(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Pilih peran Anda untuk melanjutkan",
+                    text = "Silakan masukkan akun Anda untuk melanjutkan",
                     fontSize = 13.sp,
                     color = Color(0xFF64748B),
                     textAlign = TextAlign.Center
                 )
             }
-
-            // Role 1: Admin Sekolah (Operator)
-            LoginRoleCard(
-                icon = Icons.Default.CorporateFare,
-                title = "Admin Sekolah (Operator)",
-                subtitle = "Kelola data kurikulum sekolah (Akun domain @*.sch.id)",
-                isSelected = selectedRole == UserRole.ADMIN_SEKOLAH,
-                onClick = {
-                    selectedRole = UserRole.ADMIN_SEKOLAH
-                    emailOrNip = "admin_final@sdnpancasila.sch.id"
-                    password = "KatasandiRahasia123!"
-                }
-            )
-
-            // Role 2: Guru Pengampu
-            LoginRoleCard(
-                icon = Icons.Default.School,
-                title = "Guru Pengampu",
-                subtitle = "Lihat jadwal mengajar mingguan (Akun @guru.sd.belajar.id)",
-                isSelected = selectedRole == UserRole.GURU,
-                onClick = {
-                    selectedRole = UserRole.GURU
-                    emailOrNip = "guru@guru.sd.belajar.id"
-                    password = "KatasandiRahasia123!"
-                }
-            )
-
-            // Role 3: Super Admin Sistem
-            LoginRoleCard(
-                icon = Icons.Default.Security,
-                title = "Super Admin Sistem",
-                subtitle = "Verifikasi sekolah, audit log & pemeliharaan server",
-                isSelected = selectedRole == UserRole.SUPER_ADMIN,
-                onClick = {
-                    selectedRole = UserRole.SUPER_ADMIN
-                    emailOrNip = "superadmin@jadwale.id"
-                    password = "KatasandiRahasia123!"
-                }
-            )
 
             Spacer(modifier = Modifier.height(4.dp))
 
@@ -228,32 +188,6 @@ fun LoginScreen(
                 )
             }
 
-            // School Status Verification Badge
-            Card(
-                shape = RoundedCornerShape(10.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F5F9)),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE2E8F0)),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.CheckCircle,
-                        contentDescription = null,
-                        tint = Color(0xFF15803D),
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "SDN Percobaan / SDN Pancasila terdeteksi aktif",
-                        fontSize = 11.sp,
-                        color = Color(0xFF334155),
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-            }
 
             // Error Message Box
             if (errorMessage != null) {
@@ -291,14 +225,6 @@ fun LoginScreen(
                         Toast.makeText(context, "Silakan isi email atau NIP", Toast.LENGTH_SHORT).show()
                     } else if (password.isBlank()) {
                         Toast.makeText(context, "Silakan isi kata sandi", Toast.LENGTH_SHORT).show()
-                    } else if (selectedRole == UserRole.ADMIN_SEKOLAH && emailOrNip.contains("@") && !emailOrNip.trim().endsWith(".sch.id", ignoreCase = true)) {
-                        val msg = "Akun Admin Sekolah harus menggunakan email resmi berakhiran .sch.id"
-                        errorMessage = msg
-                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
-                    } else if (selectedRole == UserRole.GURU && emailOrNip.contains("@") && !emailOrNip.contains("belajar.id", ignoreCase = true)) {
-                        val msg = "Akun Guru harus menggunakan email resmi belajar.id (contoh: @guru.sd.belajar.id)"
-                        errorMessage = msg
-                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
                     } else {
                         isLoading = true
                         errorMessage = null
@@ -414,89 +340,3 @@ fun LoginScreen(
     }
 }
 
-@Composable
-private fun LoginRoleCard(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    title: String,
-    subtitle: String,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    Card(
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) Color(0xFFEFF6FF) else Color.White
-        ),
-        border = androidx.compose.foundation.BorderStroke(
-            1.dp,
-            if (isSelected) Color(0xFF1D68E4) else Color(0xFFE2E8F0)
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(14.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(42.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(if (isSelected) Color(0xFF1D68E4) else Color(0xFFF1F5F9)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = if (isSelected) Color.White else Color(0xFF64748B),
-                    modifier = Modifier.size(22.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.width(12.dp))
-
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = title,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 13.sp,
-                    color = Color(0xFF0F172A)
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = subtitle,
-                    fontSize = 11.sp,
-                    color = Color(0xFF64748B),
-                    lineHeight = 15.sp
-                )
-            }
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Box(
-                modifier = Modifier
-                    .size(20.dp)
-                    .clip(CircleShape)
-                    .background(if (isSelected) Color(0xFF1D68E4) else Color.Transparent)
-                    .border(
-                        1.5.dp,
-                        if (isSelected) Color(0xFF1D68E4) else Color(0xFFCBD5E1),
-                        CircleShape
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                if (isSelected) {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(12.dp)
-                    )
-                }
-            }
-        }
-    }
-}

@@ -435,21 +435,6 @@ fun MenuScreen(
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text("Ubah Profil", fontSize = 11.sp)
                             }
-
-                            OutlinedButton(
-                                onClick = { showRoleDialog = true },
-                                shape = RoundedCornerShape(8.dp),
-                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                                modifier = Modifier.height(32.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.SyncAlt,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(13.dp)
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text("Ganti Role", fontSize = 11.sp)
-                            }
                         }
                     }
                 }
