@@ -51,8 +51,8 @@ fun LoginScreen(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     var selectedRole by remember { mutableStateOf(UserRole.ADMIN_SEKOLAH) }
-    var emailOrNip by remember { mutableStateOf("admin@sdnpercobaan.sch.id") }
-    var password by remember { mutableStateOf("password123") }
+    var emailOrNip by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var showInfoDialog by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
@@ -383,70 +383,7 @@ fun LoginScreen(
                 }
             }
 
-            // Demo Accounts Card
-            Card(
-                shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F5F9)),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE2E8F0)),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(
-                    modifier = Modifier.padding(14.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.Bolt,
-                            contentDescription = null,
-                            tint = Color(0xFFD97706),
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = "Gunakan akun demo untuk mencoba fitur secara instan:",
-                            fontSize = 11.sp,
-                            color = Color(0xFF475569),
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
 
-                    DemoAccountButton(
-                        label = "Isi Otomatis Admin SD",
-                        bgColor = Color(0xFFDBEAFE),
-                        textColor = Color(0xFF1D4ED8),
-                        onClick = {
-                            selectedRole = UserRole.ADMIN_SEKOLAH
-                            emailOrNip = "admin_final@sdnpancasila.sch.id"
-                            password = "KatasandiRahasia123!"
-                            Toast.makeText(context, "Akun Admin Sekolah terisi", Toast.LENGTH_SHORT).show()
-                        }
-                    )
-
-                    DemoAccountButton(
-                        label = "Isi Otomatis Guru",
-                        bgColor = Color.White,
-                        textColor = Color(0xFF0F172A),
-                        onClick = {
-                            selectedRole = UserRole.GURU
-                            emailOrNip = "guru@guru.sd.belajar.id"
-                            password = "KatasandiRahasia123!"
-                            Toast.makeText(context, "Akun Guru (@guru.sd.belajar.id) terisi", Toast.LENGTH_SHORT).show()
-                        }
-                    )
-
-                    DemoAccountButton(
-                        label = "Isi Otomatis Superadmin",
-                        bgColor = Color.White,
-                        textColor = Color(0xFF0F172A),
-                        onClick = {
-                            selectedRole = UserRole.SUPER_ADMIN
-                            emailOrNip = "superadmin@jadwale.id"
-                            password = "KatasandiRahasia123!"
-                            Toast.makeText(context, "Akun Super Admin terisi", Toast.LENGTH_SHORT).show()
-                        }
-                    )
-                }
-            }
 
             Spacer(modifier = Modifier.height(10.dp))
         }
@@ -560,44 +497,6 @@ private fun LoginRoleCard(
                     )
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun DemoAccountButton(
-    label: String,
-    bgColor: Color,
-    textColor: Color,
-    onClick: () -> Unit
-) {
-    Surface(
-        shape = RoundedCornerShape(10.dp),
-        color = bgColor,
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE2E8F0)),
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = label,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = textColor
-            )
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = null,
-                tint = textColor,
-                modifier = Modifier.size(14.dp)
-            )
         }
     }
 }

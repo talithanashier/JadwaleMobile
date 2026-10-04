@@ -20,34 +20,7 @@ data class PendingTeacherItem(
 )
 
 object TeacherVerificationStore {
-    private val _pendingList = MutableStateFlow<List<PendingTeacherItem>>(
-        listOf(
-            PendingTeacherItem(
-                id = "pt_seed_1",
-                name = "Siti Rahmawati, S.Pd",
-                nip = "19910405 201903 2 015",
-                email = "siti.rahmawati@guru.sd.belajar.id",
-                schoolId = 1,
-                schoolName = "SDN Pancasila 01",
-                teacherType = "Guru Mapel Matematika",
-                statusGuru = "PPPK (P3K)",
-                requestedAt = "Hari Ini, 09:12 WIB",
-                isApproved = false
-            ),
-            PendingTeacherItem(
-                id = "pt_seed_2",
-                name = "Dedi Irawan, S.Pd",
-                nip = "19870815 201402 1 003",
-                email = "dedi.irawan@guru.sd.belajar.id",
-                schoolId = 1,
-                schoolName = "SDN Pancasila 01",
-                teacherType = "Wali Kelas 2B & IPAS",
-                statusGuru = "PNS",
-                requestedAt = "Kemarin, 15:30 WIB",
-                isApproved = false
-            )
-        )
-    )
+    private val _pendingList = MutableStateFlow<List<PendingTeacherItem>>(emptyList())
     val pendingList: StateFlow<List<PendingTeacherItem>> = _pendingList.asStateFlow()
 
     fun addPendingTeacher(

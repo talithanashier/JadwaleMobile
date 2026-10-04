@@ -57,13 +57,13 @@ fun RoleSwitcherDialog(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.SyncAlt, contentDescription = null, tint = Color(0xFF1D68E4))
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Beralih Peran Demo", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text("Beralih Peran", fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
         },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    "Pilih perspektif pengguna untuk menguji simulasi alur kerja aplikasi Jadwale:",
+                    "Pilih perspektif pengguna untuk alur kerja aplikasi Jadwale:",
                     fontSize = 12.sp,
                     color = Color(0xFF475569)
                 )

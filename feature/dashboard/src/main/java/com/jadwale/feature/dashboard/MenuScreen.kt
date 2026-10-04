@@ -651,17 +651,8 @@ fun MenuScreen(
                     // Group 3: Akun & Konfigurasi
                     MenuGroupSection(
                         title = "Akun & Keamanan",
-                        subtitle = "Simulasi peran dan pengaturan otentikasi"
+                        subtitle = "Pengaturan otentikasi dan akun pengguna"
                     ) {
-                        MenuItemCard(
-                            icon = Icons.Default.SyncAlt,
-                            iconBg = Color(0xFFF1F5F9),
-                            iconColor = Color(0xFF475569),
-                            title = "Mode Demonstrasi / Role Switcher",
-                            subtitle = "Uji coba akses sebagai Guru, Admin, atau Tamu",
-                            badge = null,
-                            onClick = { showRoleDialog = true }
-                        )
                         MenuItemCard(
                             icon = Icons.Default.HelpOutline,
                             iconBg = Color(0xFFF1F5F9),

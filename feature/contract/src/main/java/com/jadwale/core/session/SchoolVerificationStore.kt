@@ -18,30 +18,7 @@ data class PendingSchoolItem(
 )
 
 object SchoolVerificationStore {
-    private val _pendingSchools = MutableStateFlow<List<PendingSchoolItem>>(
-        listOf(
-            PendingSchoolItem(
-                id = "sch_p01",
-                name = "SDN Cempaka Putih 01 Pagi",
-                npsn = "20104088",
-                email = "operator@sdncempakaputih01.sch.id",
-                headmaster = "Drs. H. Mulyadi, M.Pd",
-                address = "Jl. Cempaka Putih Tengah No. 12, Jakarta Pusat",
-                registrationDate = "Kemarin, 14:20",
-                status = "Menunggu Verifikasi"
-            ),
-            PendingSchoolItem(
-                id = "sch_p02",
-                name = "SDN Johar Baru 02",
-                npsn = "20104199",
-                email = "admin@sdnjoharbaru02.sch.id",
-                headmaster = "Hj. Fatimah, S.Pd",
-                address = "Jl. Percetakan Negara II No. 8, Jakarta Pusat",
-                registrationDate = "Hari Ini, 08:45",
-                status = "Menunggu Verifikasi"
-            )
-        )
-    )
+    private val _pendingSchools = MutableStateFlow<List<PendingSchoolItem>>(emptyList())
     val pendingSchools: StateFlow<List<PendingSchoolItem>> = _pendingSchools.asStateFlow()
 
     fun addPendingSchool(
