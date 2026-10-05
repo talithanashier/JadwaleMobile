@@ -699,7 +699,7 @@ fun ScheduleViewScreen(
                                                     border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFBFDBFE))
                                                 ) {
                                                     Text(
-                                                        text = if (com.jadwale.core.model.SchoolConfig.isParallel) "12 Rombel" else "6 Rombel",
+                                                        text = if (com.jadwale.core.model.SchoolConfig.isParallel) "12 Rombel" else "6 Kelas",
                                                         fontSize = 10.sp,
                                                         fontWeight = FontWeight.Bold,
                                                         color = Color(0xFF1D68E4),
@@ -904,18 +904,27 @@ fun ScheduleViewScreen(
                                                     .ifEmpty { com.jadwale.core.mock.MockDataProvider.timeSlotsTemplate }
 
                                                 val targetClasses = run {
-                                                    val raw = if (selectedGradeFilter == 0) allClasses
-                                                    else allClasses.filter { it.grade == selectedGradeFilter || it.name.startsWith("$selectedGradeFilter") }
-                                                    raw.mapIndexed { idx, cls ->
-                                                        val g = if (cls.grade in 1..6) cls.grade else ((idx / 2) + 1).coerceIn(1, 6)
-                                                        val letter = when {
-                                                            cls.name.contains("B", ignoreCase = true) -> "B"
-                                                            cls.name.contains("A", ignoreCase = true) -> "A"
-                                                            idx % 2 == 1 -> "B"
-                                                            else -> "A"
+                                                    if (!com.jadwale.core.model.SchoolConfig.isParallel) {
+                                                        val raw = if (selectedGradeFilter == 0) allClasses
+                                                        else allClasses.filter { it.grade == selectedGradeFilter || it.name.startsWith("$selectedGradeFilter") }
+                                                        val byGrade = (1..6).filter { selectedGradeFilter == 0 || it == selectedGradeFilter }.map { g ->
+                                                            val found = raw.firstOrNull { it.grade == g || it.name.startsWith("$g") }
+                                                            found?.copy(name = "$g", grade = g) ?: com.jadwale.core.model.ClassRoom("c_$g", "$g", g, 28, "Wali Kelas $g")
                                                         }
-                                                        val cleanName = if (cls.name.matches(Regex("""(?i)^\d+[A-Z]$"""))) cls.name.uppercase() else "${g}$letter"
-                                                        cls.copy(name = cleanName, grade = g)
+                                                        byGrade
+                                                    } else {
+                                                        val raw = if (selectedGradeFilter == 0) allClasses
+                                                        else allClasses.filter { it.grade == selectedGradeFilter || it.name.startsWith("$selectedGradeFilter") }
+                                                        (1..6).filter { selectedGradeFilter == 0 || it == selectedGradeFilter }.flatMap { g ->
+                                                            val matches = raw.filter { it.grade == g || it.name.startsWith("$g") }
+                                                            val aCls = matches.firstOrNull { it.name.contains("A", ignoreCase = true) }
+                                                                ?: matches.firstOrNull()?.copy(name = "${g}A", grade = g)
+                                                                ?: com.jadwale.core.model.ClassRoom("c_${g}a", "${g}A", g, 28, "Wali Kelas ${g}A")
+                                                            val bCls = matches.firstOrNull { it.name.contains("B", ignoreCase = true) }
+                                                                ?: matches.drop(1).firstOrNull()?.copy(name = "${g}B", grade = g)
+                                                                ?: com.jadwale.core.model.ClassRoom("c_${g}b", "${g}B", g, 28, "Wali Kelas ${g}B")
+                                                            listOf(aCls.copy(name = "${g}A", grade = g), bCls.copy(name = "${g}B", grade = g))
+                                                        }
                                                     }
                                                 }
 
@@ -933,7 +942,7 @@ fun ScheduleViewScreen(
                                                             verticalAlignment = Alignment.CenterVertically
                                                         ) {
                                                             Text(
-                                                                text = "Rombel",
+                                                                text = if (com.jadwale.core.model.SchoolConfig.isParallel) "Rombel" else "Kelas",
                                                                 fontWeight = FontWeight.Bold,
                                                                 fontSize = 11.sp,
                                                                 color = Color(0xFF1E293B),
@@ -1097,7 +1106,7 @@ fun ScheduleViewScreen(
                                                                     color = Color(0xFF0F172A)
                                                                 )
                                                                 Text(
-                                                                    text = if (com.jadwale.core.model.SchoolConfig.isParallel) "Rombel Paralel: ${gradeNum}A & ${gradeNum}B" else "Rombel Tunggal: Kelas $gradeNum",
+                                                                    text = if (com.jadwale.core.model.SchoolConfig.isParallel) "Rombel Paralel: ${gradeNum}A & ${gradeNum}B" else "Kelas Tunggal: Kelas $gradeNum",
                                                                     fontSize = 11.sp,
                                                                     color = Color(0xFF64748B)
                                                                 )
@@ -1168,7 +1177,7 @@ fun ScheduleViewScreen(
                                                                     verticalAlignment = Alignment.CenterVertically
                                                                 ) {
                                                                     Text(
-                                                                        text = "Rombel Kelas ${rombel.name}",
+                                                                        text = if (com.jadwale.core.model.SchoolConfig.isParallel) "Rombel Kelas ${rombel.name}" else "Kelas ${rombel.name}",
                                                                         fontSize = 12.sp,
                                                                         fontWeight = FontWeight.Bold,
                                                                         color = Color(0xFF1E40AF)

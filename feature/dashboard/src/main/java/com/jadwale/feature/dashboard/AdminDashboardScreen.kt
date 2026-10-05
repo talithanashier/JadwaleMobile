@@ -260,8 +260,8 @@ fun AdminDashboardScreen(
                 )
                 AdminStatCard(
                     title = "Total Kelas",
-                    count = if (data.classCount > 0) "${data.classCount} Kelas" else "12 Kelas",
-                    subtitle = "1A s/d 6B Paralel",
+                    count = if (data.classCount > 0) "${data.classCount} Kelas" else if (com.jadwale.core.model.SchoolConfig.isParallel) "12 Kelas" else "6 Kelas",
+                    subtitle = if (com.jadwale.core.model.SchoolConfig.isParallel) "1A-6B Paralel" else "1-6 Tunggal",
                     icon = Icons.Default.School,
                     color = Color(0xFFD97706),
                     onClick = onNavigateToClasses,

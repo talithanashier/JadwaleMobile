@@ -363,7 +363,7 @@ fun SchoolProfileBottomSheet(
 
                     Text(
                         text = if (isParallel)
-                            "✓ Struktur Paralel: rombel dibuat 1a 1b, 2a 2b, 3a 3b, 4a 4b, 5a 5b, 6a 6b (total 12 rombel aktif)."
+                            "✓ Struktur Paralel: rombel dibuat 1A 1B, 2A 2B, 3A 3B, 4A 4B, 5A 5B, 6A 6B (total 12 rombel aktif)."
                         else
                             "✓ Struktur Tunggal: kelas cukup 1 2 3 4 5 6 (total 6 kelas aktif).",
                         fontSize = 11.sp,
@@ -478,7 +478,7 @@ fun SchoolProfileBottomSheet(
                     com.jadwale.core.model.SchoolConfig.semester = semester
                     Toast.makeText(
                         context,
-                        "✓ Konfigurasi sekolah (${if (isParallel) "12 Rombel Paralel (1a-6b)" else "6 Kelas Tunggal (1-6)"}, $daysCount, $activeYear) berhasil disimpan!",
+                        "✓ Konfigurasi sekolah (${if (isParallel) "12 Rombel Paralel (1A-6B)" else "6 Kelas Tunggal (1-6)"}, $daysCount, $activeYear) berhasil disimpan!",
                         Toast.LENGTH_LONG
                     ).show()
                     onDismiss()

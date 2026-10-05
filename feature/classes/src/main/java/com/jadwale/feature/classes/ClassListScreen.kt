@@ -227,7 +227,7 @@ fun ClassListScreen(
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(
-                                    text = "${allClassRooms.size} Rombel Paralel • SDN Pancasila",
+                                    text = "${allClassRooms.size} ${if (com.jadwale.core.model.SchoolConfig.isParallel) "Rombel Paralel" else "Kelas Tunggal"} • SDN Pancasila",
                                     fontSize = 13.sp,
                                     color = Color(0xFF475569)
                                 )
@@ -266,13 +266,13 @@ fun ClassListScreen(
                                             Spacer(modifier = Modifier.width(10.dp))
                                             Column {
                                                 Text(
-                                                    text = "${allClassRooms.size} Rombel Lengkap",
+                                                    text = "${allClassRooms.size} ${if (com.jadwale.core.model.SchoolConfig.isParallel) "Rombel Lengkap" else "Kelas Lengkap"}",
                                                     fontWeight = FontWeight.Bold,
                                                     fontSize = 14.sp,
                                                     color = Color(0xFF0F172A)
                                                 )
                                                 Text(
-                                                    text = "Tingkat 1 s/d 6 (A & B)",
+                                                    text = if (com.jadwale.core.model.SchoolConfig.isParallel) "Tingkat 1 s/d 6 (1A-6B)" else "Tingkat 1 s/d 6 (1-6)",
                                                     fontSize = 11.sp,
                                                     color = Color(0xFF64748B)
                                                 )
@@ -807,8 +807,8 @@ private fun ClassModernCard(
                 }
             }
 
-            // Quick Banner for Class 1A: Atur Alokasi JP per Hari
-            if (classRoom.name == "1A") {
+            // Quick Banner for Class 1A or Class 1: Atur Alokasi JP per Hari
+            if (classRoom.name == "1A" || classRoom.name == "1") {
                 Spacer(modifier = Modifier.height(10.dp))
                 Button(
                     onClick = onDetailJp,

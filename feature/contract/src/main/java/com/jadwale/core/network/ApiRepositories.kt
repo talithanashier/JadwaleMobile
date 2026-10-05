@@ -118,10 +118,20 @@ class ApiClassRepository(
     private val api: JadwaleApiService = ApiClient.api
 ) : ClassRepository {
     companion object {
-        val sharedLocalClasses = MockDataProvider.classList.toMutableList()
+        private var lastIsParallel: Boolean? = null
+        val sharedLocalClasses = mutableListOf<ClassRoom>()
+
+        fun ensureClasses() {
+            if (lastIsParallel != SchoolConfig.isParallel || sharedLocalClasses.isEmpty()) {
+                lastIsParallel = SchoolConfig.isParallel
+                sharedLocalClasses.clear()
+                sharedLocalClasses.addAll(MockDataProvider.classList)
+            }
+        }
     }
 
     override suspend fun getClasses(schoolId: String): Result<List<ClassRoom>> = runCatching {
+        ensureClasses()
         try {
             val resp = api.getClasses()
             if (resp.isSuccessful) {
@@ -188,13 +198,9 @@ class ApiClassRepository(
                             }
                         }
                     }
-                    remoteClasses.forEach { remote ->
-                        val idx = sharedLocalClasses.indexOfFirst { it.id == remote.id || it.name.equals(remote.name, ignoreCase = true) }
-                        if (idx >= 0) {
-                            sharedLocalClasses[idx] = remote
-                        } else {
-                            sharedLocalClasses.add(remote)
-                        }
+                    if (remoteClasses.isNotEmpty()) {
+                        sharedLocalClasses.clear()
+                        sharedLocalClasses.addAll(remoteClasses)
                     }
                 }
             }
@@ -203,6 +209,7 @@ class ApiClassRepository(
     }
 
     override suspend fun addClass(schoolId: String, classRoom: ClassRoom): Result<ClassRoom> = runCatching {
+        ensureClasses()
         val newId = if (classRoom.id.isBlank() || classRoom.id.startsWith("c") || classRoom.id.startsWith("class_")) {
             val nextNum = (sharedLocalClasses.mapNotNull { it.id.filter { ch -> ch.isDigit() }.toIntOrNull() }.maxOrNull() ?: 0) + 1
             "c$nextNum"
@@ -225,6 +232,7 @@ class ApiClassRepository(
     }
 
     override suspend fun updateClass(classRoom: ClassRoom): Result<ClassRoom> = runCatching {
+        ensureClasses()
         val idx = sharedLocalClasses.indexOfFirst { it.id == classRoom.id || it.name.equals(classRoom.name, ignoreCase = true) }
         if (idx >= 0) {
             sharedLocalClasses[idx] = classRoom
@@ -241,6 +249,7 @@ class ApiClassRepository(
     }
 
     override suspend fun deleteClass(classId: String): Result<Unit> = runCatching {
+        ensureClasses()
         sharedLocalClasses.removeAll { it.id == classId || it.name.equals(classId, ignoreCase = true) }
         val intId = classId.toIntOrNull()
         if (intId != null) {

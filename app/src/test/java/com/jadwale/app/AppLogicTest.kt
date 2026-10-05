@@ -2,6 +2,7 @@ package com.jadwale.app
 
 import com.jadwale.core.mock.*
 import com.jadwale.core.model.*
+import com.jadwale.core.network.ApiClassRepository
 import com.jadwale.feature.dashboard.DashboardData
 import com.jadwale.feature.dashboard.DashboardUiState
 import com.jadwale.feature.dashboard.DashboardViewModel
@@ -109,6 +110,7 @@ class AppLogicTest {
     @Test
     fun testClassStructureParallelAndSingle() = runTest {
         val classRepo = MockClassRepository()
+        val apiClassRepo = ApiClassRepository()
 
         // 1. Test Struktur Paralel (1A s/d 6B)
         SchoolConfig.isParallel = true
@@ -116,11 +118,19 @@ class AppLogicTest {
         assertEquals(12, parallelClasses.size)
         assertEquals(listOf("1A", "1B", "2A", "2B", "3A", "3B", "4A", "4B", "5A", "5B", "6A", "6B"), parallelClasses.map { it.name })
 
+        val apiParallelClasses = apiClassRepo.getClasses("sch_sdn01").getOrThrow()
+        assertEquals(12, apiParallelClasses.size)
+        assertEquals(listOf("1A", "1B", "2A", "2B", "3A", "3B", "4A", "4B", "5A", "5B", "6A", "6B"), apiParallelClasses.map { it.name })
+
         // 2. Test Struktur Tunggal (1 s/d 6)
         SchoolConfig.isParallel = false
         val singleClasses = classRepo.getClasses("sch_sdn01").getOrThrow()
         assertEquals(6, singleClasses.size)
         assertEquals(listOf("1", "2", "3", "4", "5", "6"), singleClasses.map { it.name })
+
+        val apiSingleClasses = apiClassRepo.getClasses("sch_sdn01").getOrThrow()
+        assertEquals(6, apiSingleClasses.size)
+        assertEquals(listOf("1", "2", "3", "4", "5", "6"), apiSingleClasses.map { it.name })
 
         // Reset to default
         SchoolConfig.isParallel = true
