@@ -1,0 +1,368 @@
+// This is your Prisma schema file for SQLite development
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Sekolah {
+  id                 Int                 @id @default(autoincrement())
+  npsn               String              @unique
+  nama_sekolah       String
+  alamat             String?
+  jenjang            String?             @default("SD")
+  kepala_sekolah     String?
+  semester_aktif     String?             @default("GASAL")
+  tahun_pelajaran    String?             @default("2026/2027")
+  setupStep          Int                 @default(1)
+  setupCompleted     Boolean             @default(false)
+  status             String              @default("PENDING_SETUP")
+  deleted_at         DateTime?
+  created_at         DateTime            @default(now())
+  updated_at         DateTime            @updatedAt
+
+  users              User[]
+  gurus              Guru[]
+  guruAvailabilities GuruAvailability[]
+  tingkatans         Tingkatan[]
+  kelas              Kelas[]
+  mapels             Mapel[]
+  mapelTingkatans    MapelTingkatan[]
+  waliKelas          WaliKelas[]
+  pengampus          Pengampu[]
+  jpPerHaris         JpPerHari[]
+  config             SchoolConfig?
+  routines           RoutineActivity[]
+  scheduleSlots      ScheduleSlot[]
+  jadwals            Jadwal[]
+  periodeJadwals     PeriodeJadwal[]
+  sharedLinks        SharedLink[]
+  histories          History[]
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  id_sekolah   Int?
+  id_guru      Int?
+  role         String    @default("ADMIN_SEKOLAH") // SUPER_ADMIN, ADMIN_SEKOLAH, TENAGA_PENDIDIK, USER_BIASA, DESIGNER
+  nama         String
+  email        String    @unique
+  no_hp        String?
+  password     String
+  is_active    Boolean   @default(true)
+  is_verified  Boolean   @default(true)
+  is_admin     Boolean   @default(false)
+  deleted_at   DateTime?
+  last_login           DateTime?
+  reset_token          String?
+  reset_token_expires  DateTime?
+  created_at           DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+
+  sekolah      Sekolah?  @relation(fields: [id_sekolah], references: [id], onDelete: Restrict)
+  guru         Guru?     @relation(fields: [id_guru], references: [id], onDelete: SetNull)
+  templates    Template[]
+  sharedLinksCreated SharedLink[] @relation("CreatedBy")
+  sharedLinksAllowed SharedLink[] @relation("AllowedUser")
+  histories    History[]
+  adminLogs    AdminLog[]
+
+  @@index([id_sekolah])
+  @@index([email])
+}
+
+model Guru {
+  id           Int       @id @default(autoincrement())
+  id_sekolah   Int
+  nama         String
+  nip          String?   @unique
+  deleted_at   DateTime?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+
+  sekolah            Sekolah @relation(fields: [id_sekolah], references: [id], onDelete: Restrict)
+  users              User[]
+  guruAvailabilities GuruAvailability[]
+  waliKelas          WaliKelas[]
+  pengampus          Pengampu[]
+  jadwals            Jadwal[]
+
+  @@index([id_sekolah])
+}
+
+model GuruAvailability {
+  id           Int       @id @default(autoincrement())
+  id_sekolah   Int
+  id_guru      Int
+  hari         Int       // 1-7
+  jam_mulai    DateTime?
+  jam_selesai  DateTime?
+
+  sekolah      Sekolah @relation(fields: [id_sekolah], references: [id], onDelete: Cascade)
+  guru         Guru    @relation(fields: [id_guru], references: [id], onDelete: Cascade)
+
+  @@unique([id_sekolah, id_guru, hari])
+}
+
+model Tingkatan {
+  id           Int       @id @default(autoincrement())
+  id_sekolah   Int
+  nama         String
+  deleted_at   DateTime?
+
+  sekolah      Sekolah @relation(fields: [id_sekolah], references: [id], onDelete: Restrict)
+  kelas        Kelas[]
+  mapelTingkatans MapelTingkatan[]
+
+  @@unique([id_sekolah, nama])
+}
+
+model Kelas {
+  id             Int       @id @default(autoincrement())
+  id_sekolah     Int
+  id_tingkatan   Int
+  nama_kelas     String
+  kode_lengkap   String
+  fase           String?
+  id_wali_kelas  Int?
+  deleted_at     DateTime?
+  created_at     DateTime  @default(now())
+
+  sekolah        Sekolah   @relation(fields: [id_sekolah], references: [id], onDelete: Restrict)
+  tingkatan      Tingkatan @relation(fields: [id_tingkatan], references: [id], onDelete: Restrict)
+  
+  waliKelasList  WaliKelas[]
+  pengampus      Pengampu[]
+  jpPerHaris     JpPerHari[]
+  scheduleSlots  ScheduleSlot[]
+  jadwals        Jadwal[]
+  sharedLinks    SharedLink[]
+
+  @@unique([id_sekolah, id_tingkatan, nama_kelas])
+}
+
+model Mapel {
+  id           Int       @id @default(autoincrement())
+  id_sekolah   Int
+  nama         String
+  prioritas    Boolean   @default(false)
+  color        String    @default("#E2E8F0")
+  deleted_at   DateTime?
+
+  sekolah      Sekolah @relation(fields: [id_sekolah], references: [id], onDelete: Restrict)
+  mapelTingkatans MapelTingkatan[]
+  pengampus       Pengampu[]
+  jadwals         Jadwal[]
+
+  @@unique([id_sekolah, nama])
+}
+
+model MapelTingkatan {
+  id             Int       @id @default(autoincrement())
+  id_sekolah     Int
+  id_mapel       Int
+  id_tingkatan   Int
+  jp_per_minggu  Int
+
+  sekolah        Sekolah   @relation(fields: [id_sekolah], references: [id], onDelete: Cascade)
+  mapel          Mapel     @relation(fields: [id_mapel], references: [id], onDelete: Cascade)
+  tingkatan      Tingkatan @relation(fields: [id_tingkatan], references: [id], onDelete: Cascade)
+
+  @@unique([id_sekolah, id_mapel, id_tingkatan])
+}
+
+model WaliKelas {
+  id           Int       @id @default(autoincrement())
+  id_sekolah   Int
+  id_guru      Int
+  id_kelas     Int
+
+  sekolah      Sekolah   @relation(fields: [id_sekolah], references: [id], onDelete: Cascade)
+  guru         Guru      @relation(fields: [id_guru], references: [id], onDelete: Cascade)
+  kelas        Kelas     @relation(fields: [id_kelas], references: [id], onDelete: Cascade)
+
+  @@unique([id_sekolah, id_guru])
+  @@unique([id_sekolah, id_kelas])
+}
+
+model Pengampu {
+  id           Int       @id @default(autoincrement())
+  id_sekolah   Int
+  id_guru      Int
+  id_mapel     Int
+  id_kelas     Int
+
+  sekolah      Sekolah   @relation(fields: [id_sekolah], references: [id], onDelete: Cascade)
+  guru         Guru      @relation(fields: [id_guru], references: [id], onDelete: Cascade)
+  mapel        Mapel     @relation(fields: [id_mapel], references: [id], onDelete: Cascade)
+  kelas        Kelas     @relation(fields: [id_kelas], references: [id], onDelete: Cascade)
+
+  @@unique([id_sekolah, id_guru, id_mapel, id_kelas])
+}
+
+model JpPerHari {
+  id           Int       @id @default(autoincrement())
+  id_sekolah   Int
+  id_kelas     Int
+  hari         Int
+  jp           Int
+
+  sekolah      Sekolah   @relation(fields: [id_sekolah], references: [id], onDelete: Cascade)
+  kelas        Kelas     @relation(fields: [id_kelas], references: [id], onDelete: Cascade)
+
+  @@unique([id_sekolah, id_kelas, hari])
+}
+
+model SchoolConfig {
+  id                  Int       @id @default(autoincrement())
+  id_sekolah          Int       @unique
+  is_parallel         Boolean   @default(false)
+  class_naming        String    @default("alphabet")
+  school_days         Int       @default(5)
+  start_time          DateTime  @default(now())
+  duration_per_jp     Int       @default(35)
+  has_routine         Boolean   @default(false)
+  routine_duration    Int       @default(15)
+  break1_duration     Int       @default(15)
+  break2_duration     Int       @default(15)
+  break1_after_jp     Int       @default(3)
+  break2_after_jp     Int       @default(5)
+  has_monday_ceremony Boolean   @default(true)
+  ceremony_duration   Int       @default(35)
+  updated_at          DateTime  @updatedAt
+
+  sekolah             Sekolah   @relation(fields: [id_sekolah], references: [id], onDelete: Cascade)
+}
+
+model RoutineActivity {
+  id               Int       @id @default(autoincrement())
+  id_sekolah       Int
+  name             String
+  day_of_week      Int?
+  time_before_jp   Int?      @default(1)
+  duration         Int
+  is_active        Boolean   @default(true)
+
+  sekolah          Sekolah   @relation(fields: [id_sekolah], references: [id], onDelete: Cascade)
+}
+
+model ScheduleSlot {
+  id               Int       @id @default(autoincrement())
+  id_sekolah       Int
+  id_kelas         Int
+  hari             Int
+  jam_ke           Int
+  waktu_mulai      DateTime
+  waktu_selesai    DateTime
+  is_break         Boolean   @default(false)
+  is_ceremony      Boolean   @default(false)
+
+  sekolah          Sekolah   @relation(fields: [id_sekolah], references: [id], onDelete: Cascade)
+  kelas            Kelas     @relation(fields: [id_kelas], references: [id], onDelete: Cascade)
+
+  @@unique([id_sekolah, id_kelas, hari, jam_ke])
+}
+
+model PeriodeJadwal {
+  id           Int       @id @default(autoincrement())
+  id_sekolah   Int
+  nama         String
+  tahun_ajaran String?
+  semester     String?
+  is_active    Boolean   @default(false)
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+
+  sekolah      Sekolah   @relation(fields: [id_sekolah], references: [id], onDelete: Cascade)
+  jadwals      Jadwal[]
+
+  @@index([id_sekolah])
+}
+
+model Jadwal {
+  id                Int            @id @default(autoincrement())
+  id_sekolah        Int
+  id_periode_jadwal Int?
+  id_kelas          Int
+  hari              Int
+  jam_ke            Int
+  id_mapel          Int
+  id_guru           Int
+
+  sekolah           Sekolah        @relation(fields: [id_sekolah], references: [id], onDelete: Cascade)
+  periodeJadwal     PeriodeJadwal? @relation(fields: [id_periode_jadwal], references: [id], onDelete: Cascade)
+  kelas             Kelas          @relation(fields: [id_kelas], references: [id], onDelete: Cascade)
+  mapel             Mapel          @relation(fields: [id_mapel], references: [id], onDelete: Restrict)
+  guru              Guru           @relation(fields: [id_guru], references: [id], onDelete: Restrict)
+
+  @@index([id_sekolah, id_kelas])
+  @@index([id_guru, hari, jam_ke])
+  @@index([id_periode_jadwal])
+}
+
+model Template {
+  id               Int       @id @default(autoincrement())
+  name             String
+  thumbnail        String?
+  css_styles       String
+  is_premium       Boolean   @default(false)
+  created_by       Int
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
+
+  user             User      @relation(fields: [created_by], references: [id], onDelete: Cascade)
+}
+
+model SharedLink {
+  id               Int       @id @default(autoincrement())
+  id_sekolah       Int
+  uuid             String    @unique
+  id_kelas         Int?
+  permission       String    @default("read")
+  created_by       Int
+  allowed_user_id  Int?
+  expires_at       DateTime?
+  view_count       Int       @default(0)
+  created_at       DateTime  @default(now())
+
+  sekolah          Sekolah   @relation(fields: [id_sekolah], references: [id], onDelete: Cascade)
+  kelas            Kelas?    @relation(fields: [id_kelas], references: [id], onDelete: Cascade)
+  creator          User      @relation("CreatedBy", fields: [created_by], references: [id], onDelete: Cascade)
+  allowedUser      User?     @relation("AllowedUser", fields: [allowed_user_id], references: [id], onDelete: Cascade)
+
+  @@index([uuid])
+  @@index([expires_at])
+}
+
+model History {
+  id               Int       @id @default(autoincrement())
+  id_sekolah       Int
+  user_id          Int
+  aksi             String
+  deskripsi        String?
+  ip_address       String?
+  created_at       DateTime  @default(now())
+
+  sekolah          Sekolah   @relation(fields: [id_sekolah], references: [id], onDelete: Cascade)
+  user             User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([id_sekolah, user_id])
+}
+
+model AdminLog {
+  id               Int       @id @default(autoincrement())
+  admin_user_id    Int
+  action           String
+  target_type      String?
+  target_id        Int?
+  details          String?   // SQLite doesnt support JSON, use String to store serialized JSON
+  created_at       DateTime  @default(now())
+
+  adminUser        User      @relation(fields: [admin_user_id], references: [id], onDelete: Cascade)
+
+  @@index([admin_user_id])
+}
